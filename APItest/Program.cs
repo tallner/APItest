@@ -10,10 +10,20 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddDbContext<NotesDbContext>(options => options.UseSqlServer(
-    builder.Configuration.GetConnectionString("NotesDbConnectionString")));
+builder.Services.AddDbContext<MyDbContext>(options => options.UseSqlServer(
+    builder.Configuration.GetConnectionString("MyDbConnectionString")));
 
 var app = builder.Build();
+
+// Apply pending migrations when the application starts
+/**/
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var dbContext = services.GetRequiredService<MyDbContext>();
+    dbContext.Database.Migrate();
+}
+/**/
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

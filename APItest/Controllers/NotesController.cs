@@ -7,13 +7,13 @@ namespace APItest.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class NotesController : Controller
+    public class NotesController : ControllerBase
     {
-        private readonly NotesDbContext notesDbContext;
+        private readonly MyDbContext myDbContext;
 
-        public NotesController(NotesDbContext _notesDbContext)
+        public NotesController(MyDbContext _myDbContext)
         {
-            this.notesDbContext = _notesDbContext;
+            this.myDbContext = _myDbContext;
 
         }
 
@@ -21,7 +21,7 @@ namespace APItest.Controllers
         public async Task<IActionResult> GetAllNotes()
         {
             //get notes from db
-            return Ok(await notesDbContext.Notes.ToListAsync());
+            return Ok(await myDbContext.Notes.ToListAsync());
 
         }
 
@@ -33,7 +33,7 @@ namespace APItest.Controllers
             //get notes from db
           //  return Ok(await notesDbContext.Notes.FirstOrDefaultAsync(x => x.Id==id));
 
-            var note = (await notesDbContext.Notes.FindAsync(id));
+            var note = (await myDbContext.Notes.FindAsync(id));
 
             if (note == null) return NotFound();
             return Ok(note);
@@ -45,8 +45,8 @@ namespace APItest.Controllers
         public async Task<IActionResult> AddNote(Note note)
         {
             note.Id = Guid.NewGuid();
-            await notesDbContext.Notes.AddAsync(note);
-            await notesDbContext.SaveChangesAsync();
+            await myDbContext.Notes.AddAsync(note);
+            await myDbContext.SaveChangesAsync();
 
             return CreatedAtAction(nameof(GetNoteById),new {id=note.Id}, note);
 
@@ -56,13 +56,13 @@ namespace APItest.Controllers
         [Route("{id:Guid}")]
         public async Task<IActionResult> UpdateNote([FromRoute] Guid id, [FromBody] Note updateNote)
         {
-            var existingNote = await notesDbContext.Notes.FindAsync(id);
+            var existingNote = await myDbContext.Notes.FindAsync(id);
             if (existingNote == null) return NotFound();
 
             existingNote.Title = updateNote.Title;
             existingNote.Description = updateNote.Description;
             existingNote.IsVisible = updateNote.IsVisible;
-            await notesDbContext.SaveChangesAsync();
+            await myDbContext.SaveChangesAsync();
 
             return Ok(existingNote);
 
@@ -72,11 +72,11 @@ namespace APItest.Controllers
         [Route("{id:Guid}")]
         public async Task<IActionResult> DeleteNote([FromRoute] Guid id)
         {
-            var existingNode = notesDbContext.Notes.Find(id);
+            var existingNode = myDbContext.Notes.Find(id);
             if (existingNode == null) return NotFound();
 
-            notesDbContext.Notes.Remove(existingNode);
-            await notesDbContext.SaveChangesAsync();
+            myDbContext.Notes.Remove(existingNode);
+            await myDbContext.SaveChangesAsync();
             
             return Ok();
         }
