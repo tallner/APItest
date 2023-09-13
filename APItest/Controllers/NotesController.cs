@@ -1,5 +1,6 @@
 ﻿using APItest.Data;
 using APItest.Models.Entities;
+using APItest.Services.External;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,14 +15,21 @@ namespace APItest.Controllers
         public NotesController(MyDbContext _myDbContext)
         {
             this.myDbContext = _myDbContext;
-
         }
 
         [HttpGet]
         public async Task<IActionResult> GetAllNotes()
         {
+            
+
+            var note = (await myDbContext.Notes.ToListAsync());
+
+            var result = note;
+
             //get notes from db
-            return Ok(await myDbContext.Notes.ToListAsync());
+            return Ok(result);
+
+
 
         }
 
